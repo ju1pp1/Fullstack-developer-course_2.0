@@ -24,6 +24,23 @@ let notes = [
       important: true
     }
   ]
+  let persons = [
+    {
+      id: 1,
+      name: "Keijo Kuusinen",
+      number: "0501231231",
+    },
+    {
+      id: 2,
+      name: "Martti Koisola",
+      number: "0501231232",
+    },
+    {
+      id: 3,
+      name: "Seppo Taalasmaa",
+      number: "0501231233",
+    }
+  ]
 /*
   app.post('/api/notes', (request, response) => {
     const note = request.body
@@ -56,8 +73,25 @@ let notes = [
     res.json(notes)
   })
   */
+//Persons
+app.get('/', (request, response) => {
+  response.send('<h1>Hello world</h1>')
+  response.end(JSON.stringify(persons))
+})
+app.get('/api/persons/:id', (request, response) => {
+  const id = Number(request.params.id)
+  const person = persons.find(person => person.id === id)
+  if(person) {
+    response.json(person)
+  } else {
+    response.status(404).end()
+  }
+}) 
+app.get('/api/persons', (request, response) => {
+  response.json(persons)
+})
 
-
+//Notes
 app.get('/', (request, response) => {
     response.send('<h1>Hello world</h1>')
     response.end(JSON.stringify(notes))
