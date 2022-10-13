@@ -41,38 +41,30 @@ let notes = [
       number: "0501231233",
     }
   ]
-/*
-  app.post('/api/notes', (request, response) => {
-    const note = request.body
-    console.log(note)
-    response.json(note)
-  })
-  
-  //DEL
-  app.delete('/api/notes/:id', (request, response) => {
-    const id = Number(request.params.id)
-    notes = notes.filter(note => note.id !== id)
-    response.status(204).end()
-  })
-    */
-    //GET
-    //Nyt yksittäisen resurssin hakeminen toimii.
-    /*
-    app.get('/api/notes/:id', (request, response) => {
-    const id = Number(request.params.id)
-    const note = notes.find(note => note.id === id)
-    if (note) {
-      response.json(note)
-    } else {
-      response.status(404).end()
-    }
-    })
-    */
-  /*
-  app.get('/api/notes', (req, res) => {
-    res.json(notes)
-  })
-  */
+  let infos = [
+    {
+      text: `Phonebook has info for ${persons.length} people`,
+      date: Date(),
+    },
+  ]
+ //Info
+ app.get('/', (request, response) => {
+  response.send('<h1>Hello world</h1>')
+  response.end(JSON.stringify(infos))
+})
+ app.get('/api/infos/:id', (request, response) => {
+  const id = Number(request.params.id)
+  const info = infos.find(info => info.id === id)
+  if(info) {
+    response.json(info)
+  } else {
+    response.status(404).end()
+  }
+}) 
+app.get('/api/infos', (request, response) => {
+  response.json(infos)
+})
+
 //Persons
 app.get('/', (request, response) => {
   response.send('<h1>Hello world</h1>')
