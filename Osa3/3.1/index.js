@@ -88,12 +88,35 @@ app.delete('/api/persons/:id', (request, response) => {
   //Jos poisto onnistuu vastataan statuskoodilla 204.
   response.status(204).end()
 })
+
+const generateID = () => {
+  const randomID = persons.length > 0
+  ? Math.random(...persons.map(p => p.id))
+  : 0
+  let randomiidee = randomID * 100
+  return Math.round(randomiidee)
+}
+app.post('/api/persons', (request, response) => {
+  const body = request.body
+  if(!body.name) {
+    return response.status(400).json({
+      error: 'name missing'
+    })
+  }
+  const person = {
+    name: body.name,
+    number: body.number,
+    id: generateID(),
+  }
+  persons = persons.concat(person)
+  response.json(person)
+})
+
 //Notes
 app.get('/', (request, response) => {
     response.send('<h1>Hello world</h1>')
     response.end(JSON.stringify(notes))
 })
-
 app.get('/api/notes/:id', (request, response) => {
   const id = Number(request.params.id)
   const note = notes.find(note => note.id === id)
