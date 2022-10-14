@@ -103,6 +103,16 @@ app.post('/api/persons', (request, response) => {
       error: 'name missing'
     })
   }
+  if(!body.number) {
+    return response.status(400).json({
+      error: 'number is missing'
+    })
+  }
+  if( persons.findIndex((p) => p.name == body.name) != -1) {
+    return response.status(400).json({
+      error: 'name already exists'
+    })
+  }
   const person = {
     name: body.name,
     number: body.number,
