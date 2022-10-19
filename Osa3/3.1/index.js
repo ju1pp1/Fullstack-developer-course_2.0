@@ -1,8 +1,8 @@
 //const http = require('http')
 const express = require('express')
+const { format } = require('morgan')
+const morgan = require('morgan')
 const app = express()
-
-app.use(express.json())
 
 let notes = [
     {
@@ -47,6 +47,17 @@ let notes = [
       date: Date(),
     },
   ]
+  const requestLogger = (request, response, next) => {
+    console.log('Method:', request.method)
+    console.log('Path:  ', request.path)
+    console.log('Body:  ', request.body)
+    console.log('---')
+    next()
+  }
+
+app.use(express.json())
+app.use(requestLogger)
+app.use(morgan('tiny'))
  //Info
  app.get('/', (request, response) => {
   response.send('<h1>Hello world</h1>')
@@ -70,7 +81,7 @@ app.get('/', (request, response) => {
   response.send('<h1>Hello world</h1>')
   response.end(JSON.stringify(persons))
 })
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', morgan('tiny'), (request, response) => {
   const id = Number(request.params.id)
   const person = persons.find(person => person.id === id)
   if(person) {
@@ -172,6 +183,11 @@ app.get('/api/notes', (request, response) => {
   response.json(notes)
 })
 */
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({error: 'unknown endpoint'})
+}
+app.use(unknownEndpoint)
+
 const PORT = 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
