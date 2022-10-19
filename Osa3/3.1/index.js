@@ -57,7 +57,18 @@ let notes = [
 
 app.use(express.json())
 app.use(requestLogger)
-app.use(morgan('tiny'))
+//app.use(morgan('tiny'))
+morgan.token('body', (req, res) => JSON.stringify(req.body))
+app.use(morgan((tokens, req, res) => {
+  return [
+    tokens.method(req, res),
+    tokens.url(req, res),
+    tokens.status(req, res),
+    tokens.res(req, res, 'content-length'), '-',
+    tokens['response-time'](req, res), 'ms',
+    tokens.body(req, res)
+  ].join(' ')
+}))
  //Info
  app.get('/', (request, response) => {
   response.send('<h1>Hello world</h1>')
