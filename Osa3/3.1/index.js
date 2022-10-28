@@ -2,6 +2,7 @@
 const express = require('express')
 const { format } = require('morgan')
 const morgan = require('morgan')
+const cors = require('cors')
 const app = express()
 
 let notes = [
@@ -57,6 +58,8 @@ let notes = [
 
 app.use(express.json())
 app.use(requestLogger)
+app.use(cors())
+app.use(express.static('build'))
 //app.use(morgan('tiny'))
 morgan.token('body', (req, res) => JSON.stringify(req.body))
 app.use(morgan((tokens, req, res) => {
@@ -118,7 +121,7 @@ const generateID = () => {
   let randomiidee = randomID * 100
   return Math.round(randomiidee)
 }
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response) => { //'api/persons'
   const body = request.body
   if(!body.name) {
     return response.status(400).json({
@@ -199,7 +202,7 @@ const unknownEndpoint = (request, response) => {
 }
 app.use(unknownEndpoint)
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001 //3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
