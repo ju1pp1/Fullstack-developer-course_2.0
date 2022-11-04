@@ -109,7 +109,7 @@ app.get('/api/persons', (request, response) => {
 })
 app.delete('/api/persons/:id', (request, response) => {
   const id = Number(request.params.id)
-  person = persons.filter(person => person.id !== id)
+  persons = persons.filter(person => person.id !== id)
   //Jos poisto onnistuu vastataan statuskoodilla 204.
   response.status(204).end()
 })
@@ -184,7 +184,7 @@ app.post('/api/notes', (request, response) => {
     })
   }
   const note = {
-    content: body.conntent,
+    content: body.content,
     important: body.important || false,
     date: new Date(),
     id: generateId(),
@@ -192,11 +192,11 @@ app.post('/api/notes', (request, response) => {
   notes = notes.concat(note)
   response.json(note)
 })
-/*
+
 app.get('/api/notes', (request, response) => {
   response.json(notes)
 })
-*/
+
 const unknownEndpoint = (request, response) => {
   response.status(404).send({error: 'unknown endpoint'})
 }

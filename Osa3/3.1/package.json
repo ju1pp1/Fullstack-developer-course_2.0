@@ -7,7 +7,7 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:ui": "powershell -command \"rm -rf build && cd ../tehtava_2.19/ && npm run build && cp -r build ../3.1\"",
+    "build:ui": "powershell -command \"rm build ; cd C:/Users/jerem/OneDrive/Tiedostot/GitHub/Fullstack-developer-course/Osa2/2.19/tehtava_2.19 ; npm run build ; cp -r build C:/Users/jerem/OneDrive/Tiedostot/GitHub/Fullstack-developer-course_2.0/Osa3/3.1\"",
     "deploy": "flyctl deploy",
     "deploy:full": "npm run build:ui && npm run deploy",
     "logs:prod": "flyctl logs"
