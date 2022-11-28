@@ -11,7 +11,8 @@ const contactName = process.argv[3]
 const contactNumber = process.argv[4]
 
 const url =
-  `mongodb+srv://jeremi:<password>@cluster0.6w4o3n6.mongodb.net/phoneBook?retryWrites=true&w=majority`
+  `mongodb+srv://jeremi:andersin92@cluster0.6w4o3n6.mongodb.net/phoneBook?retryWrites=true&w=majority`
+// ÄLÄ TALLETA SALASANAA GITHUBIIN
 
 mongoose.connect(url)
 

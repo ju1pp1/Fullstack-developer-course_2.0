@@ -1,9 +1,28 @@
 //const http = require('http')
+//const mongoose = require('mongoose')
 const express = require('express')
 const { format } = require('morgan')
 const morgan = require('morgan')
 const cors = require('cors')
 const app = express()
+require('dotenv').config()
+const Contact = require('./models/person')
+/* 
+const url =
+  `mongodb+srv://jeremi:andersin92@cluster0.6w4o3n6.mongodb.net/phoneBook?retryWrites=true&w=majority`
+*/
+  // ÄLÄ TALLETA SALASANAA GITHUBIIN
+
+//mongoose.connect(url)
+
+/*
+const contactSchema = new mongoose.Schema({
+  name: String,
+  phone: String,
+})
+
+const Contact = new mongoose.model('Contact', contactSchema)
+*/
 
 let notes = [
     {
@@ -96,6 +115,9 @@ app.get('/', (request, response) => {
   response.end(JSON.stringify(persons))
 })
 app.get('/api/persons/:id', morgan('tiny'), (request, response) => {
+  Contact.findById(request.params.id).then(person => {
+    response.json(person)
+  })
   const id = Number(request.params.id)
   const person = persons.find(person => person.id === id)
   if(person) {
@@ -105,8 +127,19 @@ app.get('/api/persons/:id', morgan('tiny'), (request, response) => {
   }
 }) 
 app.get('/api/persons', (request, response) => {
+  Contact.find({}).then(persons => {
   response.json(persons)
 })
+})
+/*
+contactSchema.set('toJSON', {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString()
+    delete returnedObject._id
+    delete returnedObject.__v
+  }
+})
+*/
 app.delete('/api/persons/:id', (request, response) => {
   const id = Number(request.params.id)
   persons = persons.filter(person => person.id !== id)
@@ -123,9 +156,20 @@ const generateID = () => {
 }
 app.post('/api/persons', (request, response) => { //'api/persons'
   const body = request.body
+
+  if (body.name === undefined) {
+    return response.status(400).json({
+      error: 'name missing'
+    })
+  }
   if(!body.name) {
     return response.status(400).json({
       error: 'name missing'
+    })
+  }
+  if(body.number === undefined) {
+    return response.status(400).json({
+      error: 'number missing'
     })
   }
   if(!body.number) {
@@ -138,13 +182,24 @@ app.post('/api/persons', (request, response) => { //'api/persons'
       error: 'name already exists'
     })
   }
+  /*
   const person = {
     name: body.name,
     number: body.number,
     id: generateID(),
   }
+*/
+  const person = new Contact({
+    name: body.name,
+    number: body.number,
+    id: generateID(),
+  })
   persons = persons.concat(person)
-  response.json(person)
+    //response.json(person)
+
+  person.save().then(savedPerson => {
+    response.json(savedPerson)
+  })
 })
 
 //Notes
