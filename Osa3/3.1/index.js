@@ -75,10 +75,11 @@ let notes = [
     next()
   }
 
-app.use(express.json())
-app.use(requestLogger)
-app.use(cors())
 app.use(express.static('build'))
+app.use(express.json())
+app.use(cors())
+app.use(requestLogger)
+
 //app.use(morgan('tiny'))
 morgan.token('body', (req, res) => JSON.stringify(req.body))
 app.use(morgan((tokens, req, res) => {
@@ -91,6 +92,7 @@ app.use(morgan((tokens, req, res) => {
     tokens.body(req, res)
   ].join(' ')
 }))
+
  //Info
  app.get('/', (request, response) => {
   response.send('<h1>Hello world</h1>')
@@ -114,10 +116,18 @@ app.get('/', (request, response) => {
   response.send('<h1>Hello world</h1>')
   response.end(JSON.stringify(persons))
 })
-app.get('/api/persons/:id', morgan('tiny'), (request, response) => {
-  Contact.findById(request.params.id).then(person => {
+app.get('/api/persons/:id', morgan('tiny'), (request, response, next) => {
+  Contact.findById(request.params.id)
+  .then(person => {
+   if(person) {
     response.json(person)
+   }
+   else {
+    response.status(404).end()
+   }
   })
+  .catch(error => next(error))
+
   const id = Number(request.params.id)
   const person = persons.find(person => person.id === id)
   if(person) {
@@ -140,12 +150,30 @@ contactSchema.set('toJSON', {
   }
 })
 */
-app.delete('/api/persons/:id', (request, response) => {
+
+app.delete('/api/persons/:id', (request, response, next) => {
+  Contact.findByIdAndRemove(request.params.id)
+  .then(result => {
+      response.status(204).end()
+  })
+  .catch(error => next(error))
+
   const id = Number(request.params.id)
   persons = persons.filter(person => person.id !== id)
   //Jos poisto onnistuu vastataan statuskoodilla 204.
   response.status(204).end()
 })
+
+/*
+app.delete('/api/persons/:id', (request, response, next ) => {
+  Contact.findByIdAndRemove(request.params.id)
+  .then(result => {
+    response.status(204).end()
+  })
+  .catch(error => next(error))
+  //Jos poisto onnistuu vastataan statuskoodilla 204.
+})
+*/
 
 const generateID = () => {
   const randomID = persons.length > 0
@@ -192,6 +220,7 @@ app.post('/api/persons', (request, response) => { //'api/persons'
   const person = new Contact({
     name: body.name,
     number: body.number,
+    important: body.important || false,
     id: generateID(),
   })
   persons = persons.concat(person)
@@ -200,6 +229,19 @@ app.post('/api/persons', (request, response) => { //'api/persons'
   person.save().then(savedPerson => {
     response.json(savedPerson)
   })
+})
+
+app.put('/api/persons/:id', (request, response, next) => {
+  const body = request.body
+  const person = {
+    name: body.name,
+    important: body.important,
+  }
+  Contact.findByIdAndUpdate(request.params.id, person, {new: true})
+  .then(updatedPerson => {
+    response.json(updatedPerson)
+  })
+  .catch(error => next(error))
 })
 
 //Notes
@@ -256,6 +298,16 @@ const unknownEndpoint = (request, response) => {
   response.status(404).send({error: 'unknown endpoint'})
 }
 app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if(error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformed id' })
+  }
+  next(error)
+}
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001 //3001
 app.listen(PORT, () => {
