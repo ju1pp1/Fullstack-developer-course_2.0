@@ -235,6 +235,19 @@ app.put('/api/persons/:id', (request, response, next) => {
   const body = request.body
   const person = {
     name: body.name,
+    number: body.number,
+  }
+  Contact.findByIdAndUpdate(request.params.id, person, {new: true})
+  .then(updatedNumber => {
+    response.json(updatedNumber)
+  })
+  .catch(error => next(error))
+})
+
+app.put('/api/persons/:id', (request, response, next) => {
+  const body = request.body
+  const person = {
+    name: body.name,
     important: body.important,
   }
   Contact.findByIdAndUpdate(request.params.id, person, {new: true})
