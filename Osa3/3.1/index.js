@@ -63,7 +63,7 @@ let notes = [
   ]
   let infos = [
     {
-      text: `Phonebook has info for ${persons.length} people`,
+      text: `Phonebook has info for ${Contact.name.length} people`, //persons.length
       date: Date(),
     },
   ]
@@ -114,12 +114,13 @@ app.get('/api/infos', (request, response) => {
 //Persons
 app.get('/', (request, response) => {
   response.send('<h1>Hello world</h1>')
-  response.end(JSON.stringify(persons))
+  response.end(JSON.stringify(persons)) //persons
 })
 app.get('/api/persons/:id', morgan('tiny'), (request, response, next) => {
   Contact.findById(request.params.id)
   .then(person => {
    if(person) {
+    console.log(person.id)
     response.json(person)
    }
    else {
@@ -127,14 +128,15 @@ app.get('/api/persons/:id', morgan('tiny'), (request, response, next) => {
    }
   })
   .catch(error => next(error))
-
+/*
   const id = Number(request.params.id)
-  const person = persons.find(person => person.id === id)
+  const person = persons.find(person => person.id === id) //persons
   if(person) {
     response.json(person)
   } else {
     response.status(404).end()
   }
+*/
 }) 
 app.get('/api/persons', (request, response) => {
   Contact.find({}).then(persons => {
@@ -230,7 +232,7 @@ app.post('/api/persons', (request, response) => { //'api/persons'
     response.json(savedPerson)
   })
 })
-
+/*
 app.put('/api/persons/:id', (request, response, next) => {
   const body = request.body
   const person = {
@@ -243,11 +245,13 @@ app.put('/api/persons/:id', (request, response, next) => {
   })
   .catch(error => next(error))
 })
+*/
 
 app.put('/api/persons/:id', (request, response, next) => {
   const body = request.body
   const person = {
     name: body.name,
+    number: body.number,
     important: body.important,
   }
   Contact.findByIdAndUpdate(request.params.id, person, {new: true})
