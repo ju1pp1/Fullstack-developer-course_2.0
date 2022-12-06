@@ -7,6 +7,9 @@ const cors = require('cors')
 const app = express()
 require('dotenv').config()
 const Contact = require('./models/person')
+const { request, text, response } = require('express')
+const { db } = require('./models/person')
+const person = require('./models/person')
 /* 
 const url =
   `mongodb+srv://jeremi:andersin92@cluster0.6w4o3n6.mongodb.net/phoneBook?retryWrites=true&w=majority`
@@ -59,12 +62,11 @@ let notes = [
       id: 3,
       name: "Seppo Taalasmaa",
       number: "0501231233",
-    }
-  ]
-  let infos = [
+    },
     {
-      text: `Phonebook has info for ${Contact.name.length} people`, //persons.length
-      date: Date(),
+      id: 4,
+      name: "Jarmo",
+      number: "035023035",
     },
   ]
   const requestLogger = (request, response, next) => {
@@ -107,8 +109,21 @@ app.use(morgan((tokens, req, res) => {
     response.status(404).end()
   }
 }) 
+
 app.get('/api/infos', (request, response) => {
-  response.json(infos)
+  const hello = Contact.find({}).then(persons => {
+    let infos = [
+      {
+        text: `Phonebook has info for ${persons.length} people`, 
+        date: Date(),
+      },
+    ]
+    
+    response.json(infos)
+  })
+  
+  console.log(hello)
+  
 })
 
 //Persons
