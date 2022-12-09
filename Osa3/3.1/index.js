@@ -199,7 +199,7 @@ const generateID = () => {
   let randomiidee = randomID * 100
   return Math.round(randomiidee)
 }
-app.post('/api/persons', (request, response) => { //'api/persons'
+app.post('/api/persons', (request, response, next) => { //'api/persons'
   const body = request.body
 
   if (body.name === undefined) {
@@ -246,6 +246,7 @@ app.post('/api/persons', (request, response) => { //'api/persons'
   person.save().then(savedPerson => {
     response.json(savedPerson)
   })
+  .catch(error => next(error))
 })
 /*
 app.put('/api/persons/:id', (request, response, next) => {
@@ -261,8 +262,9 @@ app.put('/api/persons/:id', (request, response, next) => {
   .catch(error => next(error))
 })
 */
-
+/*
 app.put('/api/persons/:id', (request, response, next) => {
+  const {content, important} = request.body
   const body = request.body
   const person = {
     name: body.name,
@@ -270,6 +272,16 @@ app.put('/api/persons/:id', (request, response, next) => {
     important: body.important,
   }
   Contact.findByIdAndUpdate(request.params.id, person, {new: true})
+  .then(updatedPerson => {
+    response.json(updatedPerson)
+  })
+  .catch(error => next(error))
+})
+*/
+
+app.put('/api/persons/:id', (request, response, next) => {
+  const {name, number, important} = request.body
+  Contact.findByIdAndUpdate(request.params.id, {name, number, important}, {new: true, runValidators: true, context: "query "})
   .then(updatedPerson => {
     response.json(updatedPerson)
   })
@@ -336,6 +348,8 @@ const errorHandler = (error, request, response, next) => {
 
   if(error.name === 'CastError') {
     return response.status(400).send({ error: 'malformed id' })
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message }) //
   }
   next(error)
 }
