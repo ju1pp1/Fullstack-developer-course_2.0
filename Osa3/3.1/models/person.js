@@ -26,7 +26,16 @@ const contactSchema = new mongoose.Schema({
   },
   number: {
     type: String,
-    required: true
+    minlength: 8,
+    validate: {
+      validator: val = (v) => {
+        
+        return (/\d{3}-\d{5}/.test(v) || /\d{2}-\d{6}/.test(v))
+      },
+      message: props => `${props.value} is not a valid phone number, too few numbers or "-" may be required after the first 2 or 3 numbers.`
+    },
+    required: "-",
+    required: true,
   },
   important: Boolean,
 })
